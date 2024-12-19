@@ -10,18 +10,18 @@ export interface SwappableOptions {
 
 export type Product = {
   id: number;
-  layout?: string;
-  hotswappable?: string;
-  HE?: string;
-  type: string;
   name: string;
+  type: string;
   price: number;
   image: string;
   hoverImage: string;
   images: string[];
+  layout: string;
+  hotswappable: string;
   description: string;
-  switches?: string[];
-  keycapsMaterial?: string;
-  caseMaterial?: string;
-  swappableOptions?: SwappableOptions;
+  switches: string[];
+  keycapsMaterial: string | undefined;
+  caseMaterial: string | undefined;
+  swappableOptionsJson: SwappableOptions;
+  he: string;
 };

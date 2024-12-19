@@ -3,56 +3,74 @@
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Layout from '@/app/Components/Layout';
-import { Product, SwappableOption } from '@/app/mockProducts';
 import Image from 'next/image';
 import RecommendedProducts from '@/app/Components/ReccomendedProducts';
 import { useCart } from '@/app/contexts/cartcontext';
+import { Product, SwappableOption, SwappableOptions } from '@/app/mockProducts';
+
 
 export default function KeyboardPage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
+  const [parsedSwappableOptions, setParsedSwappableOptions] = useState<SwappableOptions | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: SwappableOption }>({});
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchKeyboard = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(`http://localhost:8080/api/products/keyboards/${id}`);
         if (!response.ok) throw new Error('Failed to fetch keyboard product');
-        const data: Product = await response.json();
-
-        // Parsing swappableOptionsJson
-        const swappableOptions = data.swappableOptions;
-        const swappableOptionsObject: { [key: string]: SwappableOption } = {};
-        if (swappableOptions) {
-          for (const category in swappableOptions) {
-            swappableOptionsObject[category] = swappableOptions[category][0];
+        
+        const data: Product[] = await response.json();
+        if (!data.length) throw new Error('No keyboard found');
+        
+        const productData = data[0];
+        
+        // Ensure swappableOptionsJson is properly parsed if it's a string
+        let parsedOptions: SwappableOptions;
+        if (typeof productData.swappableOptionsJson === 'string') {
+          parsedOptions = JSON.parse(productData.swappableOptionsJson);
+        } else {
+          parsedOptions = productData.swappableOptionsJson;
+        }
+        
+        // Initialize selected options with the first option from each category
+        const initialSelectedOptions: { [key: string]: SwappableOption } = {};
+        Object.entries(parsedOptions).forEach(([category, options]) => {
+          if (Array.isArray(options) && options.length > 0) {
+            initialSelectedOptions[category] = options[0];
           }
-        }
-
-        setProduct(data);
-        setSelectedImage(data.image || ''); // Default to the first image
-        setTotalPrice(data.price || 0);
-
-        if (swappableOptionsObject) {
-          setSelectedOptions(swappableOptionsObject);
-        }
+        });
+  
+        setProduct(productData);
+        setSelectedImage(productData.image);
+        setParsedSwappableOptions(parsedOptions);
+        setSelectedOptions(initialSelectedOptions);
+        setTotalPrice(productData.price);
+        setError(null);
       } catch (error) {
         console.error('Error fetching keyboard:', error);
+        setError(error instanceof Error ? error.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
       }
     };
-
+  
     fetchKeyboard();
   }, [id]);
 
   useEffect(() => {
     if (product) {
-      let newTotalPrice = product.price || 0;
+      let newTotalPrice = product.price;
       Object.values(selectedOptions).forEach(option => {
-        newTotalPrice += option.price || 0;
+        newTotalPrice += option.price;
       });
       setTotalPrice(newTotalPrice);
     }
@@ -71,13 +89,27 @@ export default function KeyboardPage() {
     }
   };
 
-  if (!product) {
-    return (
-      <Layout>
-        <div className="text-center text-gray-700 text-xl py-16">Keyboard not found</div>
-      </Layout>
-    );
-  }
+  if (isLoading) return (
+    <Layout>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl text-gray-700">Loading...</div>
+      </div>
+    </Layout>
+  );
+
+  if (error) return (
+    <Layout>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl text-red-600">{error}</div>
+      </div>
+    </Layout>
+  );
+
+  if (!product) return (
+    <Layout>
+      <div className="text-center text-gray-700 text-xl py-16">Keyboard not found</div>
+    </Layout>
+  );
 
   return (
     <Layout>
@@ -95,9 +127,9 @@ export default function KeyboardPage() {
               />
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {product.images && product.images.length > 0 ? (
+              {product.images?.length > 0 ? (
                 product.images.map((img, index) => (
-                  <div
+                  <button
                     key={index}
                     className={`cursor-pointer border-2 rounded-md transition-all duration-200 hover:border-gray-600 ${
                       img === selectedImage ? 'border-black' : 'border-transparent'
@@ -111,10 +143,10 @@ export default function KeyboardPage() {
                       height={150}
                       className="w-full h-auto object-cover rounded-md"
                     />
-                  </div>
+                  </button>
                 ))
               ) : (
-                <p>No images available</p>
+                <p className="text-gray-500">No additional images available</p>
               )}
             </div>
           </div>
@@ -122,46 +154,69 @@ export default function KeyboardPage() {
           {/* Product Details Section */}
           <div>
             <h1 className="text-4xl font-bold mb-4 text-gray-900">{product.name}</h1>
-            <p className="text-2xl font-semibold text-gray-800 mb-2">
+            <p className="text-2xl font-semibold text-gray-800 mb-6">
               £{totalPrice.toFixed(2)} <span className="text-lg text-gray-500">inc VAT</span>
             </p>
 
-            {product.swappableOptions &&
-              Object.entries(product.swappableOptions).map(([category, options]) => (
-                <div key={category} className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{category}</label>
-                  <select
-                    className="text-black bg-grey-700 mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md"
-                    value={selectedOptions[category]?.name || ''}
-                    onChange={e =>
-                      handleOptionChange(
-                        category,
-                        options.find(opt => opt.name === e.target.value) || options[0]
-                      )
-                    }
-                  >
-                    {options.map(option => (
-                      <option key={option.name} value={option.name}>
-                        {option.name} (+£{option.price.toFixed(2)})
-                      </option>
-                    ))}
-                  </select>
+            <div className="space-y-6">
+              {parsedSwappableOptions && Object.entries(parsedSwappableOptions).map(([category, options]) => {
+                // Ensure options is an array before mapping
+                if (!Array.isArray(options)) {
+                  console.error(`Options for category ${category} is not an array:`, options);
+                  return null;
+                }
+
+                return (
+                  <div key={category}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {category}
+                    </label>
+                    <select
+                      className="w-full px-3 py-2 text-black bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                      value={selectedOptions[category]?.name || ''}
+                      onChange={(e) => {
+                        const selectedOption = options.find(opt => opt.name === e.target.value);
+                        if (selectedOption) {
+                          handleOptionChange(category, selectedOption);
+                        }
+                      }}
+                    >
+                      {options.map((option) => (
+                        <option key={option.name} value={option.name}>
+                          {option.name} (+£{option.price.toFixed(2)})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-8 space-y-4">
+              <p className="text-gray-700">{product.description}</p>
+              
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                <div>
+                  <span className="font-medium">Layout:</span> {product.layout}
                 </div>
-              ))}
+                <div>
+                  <span className="font-medium">Hot-swappable:</span> {product.hotswappable}
+                </div>
+              </div>
 
-            <p className="text-gray-700 mb-6 mt-6">{product.description}</p>
-
-            <div>
               <button
                 onClick={handleAddToCart}
-                className="bg-black text-white py-3 px-6 mt-8 rounded-lg font-semibold shadow-lg hover:bg-gray-800 transition duration-300"
+                className="w-full bg-black text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:bg-gray-800 transition duration-300"
               >
                 Add to Cart
               </button>
             </div>
           </div>
         </div>
-        <RecommendedProducts currentProductId={id} products={[]} />
+
+        <div className="mt-16">
+          <RecommendedProducts currentProductId={id} products={[]} />
+        </div>
       </div>
     </Layout>
   );
