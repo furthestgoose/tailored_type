@@ -1,61 +1,58 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Layout from '@/app/Components/Layout';
 import { Product, SwappableOption } from '@/app/mockProducts';
 import Image from 'next/image';
-import { useCart } from '@/app/contexts/cartcontext';
 import RecommendedProducts from '@/app/Components/ReccomendedProducts';
+import { useCart } from '@/app/contexts/cartcontext';
 
-export default function ProductPage() {
+export default function KeyboardPage() {
   const params = useParams();
-  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: SwappableOption }>({});
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const quantity: number = 1;
   const { addToCart } = useCart();
 
-  // Fetch product data from the API
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchKeyboard = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/products/${id}`);
-        if (!response.ok) throw new Error('Failed to fetch product');
+        const response = await fetch(`http://localhost:8080/api/products/keyboards/${id}`);
+        if (!response.ok) throw new Error('Failed to fetch keyboard product');
         const data: Product = await response.json();
 
-        if (data.type === 'keyboard') {
-          router.push(`/keyboards/${id}`);
-        } else {
-          setProduct(data);
-          setSelectedImage(data.images[0]);
-          setTotalPrice(data.price);
-
-          if (data.swappableOptions) {
-            const initialOptions: { [key: string]: SwappableOption } = {};
-            Object.entries(data.swappableOptions).forEach(([category, options]) => {
-              if (options.length > 0) initialOptions[category] = options[0];
-            });
-            setSelectedOptions(initialOptions);
+        // Parsing swappableOptionsJson
+        const swappableOptions = data.swappableOptions;
+        const swappableOptionsObject: { [key: string]: SwappableOption } = {};
+        if (swappableOptions) {
+          for (const category in swappableOptions) {
+            swappableOptionsObject[category] = swappableOptions[category][0];
           }
         }
+
+        setProduct(data);
+        setSelectedImage(data.image || ''); // Default to the first image
+        setTotalPrice(data.price || 0);
+
+        if (swappableOptionsObject) {
+          setSelectedOptions(swappableOptionsObject);
+        }
       } catch (error) {
-        console.error('Error fetching product:', error);
+        console.error('Error fetching keyboard:', error);
       }
     };
 
-    fetchProduct();
-  }, [id, router]);
+    fetchKeyboard();
+  }, [id]);
 
-  // Update total price based on selected options
   useEffect(() => {
     if (product) {
-      let newTotalPrice = product.price;
+      let newTotalPrice = product.price || 0;
       Object.values(selectedOptions).forEach(option => {
-        newTotalPrice += option.price;
+        newTotalPrice += option.price || 0;
       });
       setTotalPrice(newTotalPrice);
     }
@@ -70,55 +67,14 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart(product, quantity, selectedOptions);
-    }
-  };
-
-  const renderProductInfo = () => {
-    if (!product) return null;
-
-    switch (product.type) {
-      case 'switches':
-        return (
-          <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
-            <h2 className="text-2xl font-semibold mb-2">Switch Specifications</h2>
-            <ul className="list-disc ml-6">
-              <li>Type: {product.name}</li>
-              <li>Actuation Force: 50g</li>
-              <li>Durability: 50 million keystrokes</li>
-            </ul>
-          </div>
-        );
-      case 'keycaps':
-        return (
-          <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
-            <h2 className="text-2xl font-semibold mb-2">Keycap Specifications</h2>
-            <ul className="list-disc ml-6">
-              <li>Material: {product.keycapsMaterial || 'PBT'}</li>
-              <li>Profile: Cherry</li>
-              <li>Compatibility: MX Stem</li>
-            </ul>
-          </div>
-        );
-      case 'case':
-        return (
-          <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
-            <h2 className="text-2xl font-semibold mb-2">Case Specifications</h2>
-            <ul className="list-disc ml-6">
-              <li>Material: {product.caseMaterial || 'Wood'}</li>
-              <li>Form Factor: 60%</li>
-            </ul>
-          </div>
-        );
-      default:
-        return null;
+      addToCart(product, 1, selectedOptions);
     }
   };
 
   if (!product) {
     return (
       <Layout>
-        <div className="text-center text-gray-700 text-xl py-16">Product not found</div>
+        <div className="text-center text-gray-700 text-xl py-16">Keyboard not found</div>
       </Layout>
     );
   }
@@ -139,23 +95,27 @@ export default function ProductPage() {
               />
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {product.images.map((img, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer border-2 rounded-md transition-all duration-200 hover:border-gray-600 ${
-                    img === selectedImage ? 'border-black' : 'border-transparent'
-                  }`}
-                  onClick={() => setSelectedImage(img)}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.name} view ${index + 1}`}
-                    width={150}
-                    height={150}
-                    className="w-full h-auto object-cover rounded-md"
-                  />
-                </div>
-              ))}
+              {product.images && product.images.length > 0 ? (
+                product.images.map((img, index) => (
+                  <div
+                    key={index}
+                    className={`cursor-pointer border-2 rounded-md transition-all duration-200 hover:border-gray-600 ${
+                      img === selectedImage ? 'border-black' : 'border-transparent'
+                    }`}
+                    onClick={() => setSelectedImage(img)}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${product.name} view ${index + 1}`}
+                      width={150}
+                      height={150}
+                      className="w-full h-auto object-cover rounded-md"
+                    />
+                  </div>
+                ))
+              ) : (
+                <p>No images available</p>
+              )}
             </div>
           </div>
 
@@ -188,8 +148,6 @@ export default function ProductPage() {
                   </select>
                 </div>
               ))}
-
-            {renderProductInfo()}
 
             <p className="text-gray-700 mb-6 mt-6">{product.description}</p>
 

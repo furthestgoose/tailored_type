@@ -44,7 +44,7 @@ const Slideshow: React.FC<{ products: Product[] }> = ({ products }) => {
             <h3 className="text-lg font-semibold">{product.name}</h3>
             {product.swappableOptions && <p className="text-lg">From £{product.price.toFixed(2)} inc VAT</p>}
             {!product.swappableOptions && <p className="text-lg">£{product.price.toFixed(2)} inc VAT</p>}
-            <Link href={`/products/${product.id}`}>
+            <Link href={product.type === 'keyboard' ? `/products/keyboards/${product.id}` : `/products/${product.id}`}>
               <button className="mt-2 bg-white text-black py-2 px-4 rounded hover:bg-gray-200 transition-colors duration-300">
                 Buy Now!
               </button>
