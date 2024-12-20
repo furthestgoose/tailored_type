@@ -192,20 +192,19 @@ export default function KeyboardPage() {
               })}
             </div>
 
+            
+
             <div className="mt-8 space-y-4">
               <p className="text-gray-700">{product.description}</p>
+              <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
+            <h2 className="text-2xl font-semibold mb-2">{product.name} Specifications</h2>
+            <ul className="list-disc ml-6">
+              <li>Layout: {product.layout}</li>
+              <li>Hot-swappable: {product.hotswappable}</li>
+              <li>Hall Effect: {product.he}</li>
+            </ul>
+          </div>
               
-              <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                <div>
-                  <span className="font-medium">Layout:</span> {product.layout}
-                </div>
-                <div>
-                  <span className="font-medium">Hot-swappable:</span> {product.hotswappable}
-                </div>
-                <div>
-                  <span className="font-medium">HE:</span> {product.he}
-                </div>
-              </div>
 
               <button
                 onClick={handleAddToCart}

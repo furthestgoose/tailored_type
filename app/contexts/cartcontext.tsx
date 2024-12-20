@@ -12,7 +12,11 @@ interface CartItem extends Product {
 interface CartContextType {
   items: CartItem[];
   addToCart: (product: Product, quantity: number, selectedOptions?: { [key: string]: SwappableOption }) => void;
-  removeFromCart: (productId: number) => void;
+  removeFromCart: (
+    productId: number,
+    selectedOptions?: { [key: string]: SwappableOption },
+    removeQuantity?: number
+  ) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -53,22 +57,37 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [items, cookieConsent, isLoaded]);
 
+  const getUniqueItemId = (product: Product, selectedOptions?: { [key: string]: SwappableOption }): string => {
+    if (!selectedOptions) return product.id.toString();
+    const optionsString = Object.entries(selectedOptions)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, val]) => `${key}-${val.name}`)
+      .join('_');
+    return `${product.id}-${optionsString}`;
+  };
+  
   const addToCart = (product: Product, quantity: number, selectedOptions?: { [key: string]: SwappableOption }) => {
     setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
+      const uniqueId = getUniqueItemId(product, selectedOptions);
+      const existingItem = prevItems.find(item => 
+        getUniqueItemId(item, item.selectedOptions) === uniqueId
+      );
+  
       if (existingItem) {
         return prevItems.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity, selectedOptions }
+          getUniqueItemId(item, item.selectedOptions) === uniqueId
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
       return [...prevItems, { ...product, quantity, selectedOptions }];
     });
   };
-
-  const removeFromCart = (productId: number) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== productId));
+  
+  const removeFromCart = (productId: number, selectedOptions?: { [key: string]: SwappableOption }) => {
+    setItems(prevItems => prevItems.filter(item => 
+      getUniqueItemId(item, item.selectedOptions) !== getUniqueItemId({ id: productId } as Product, selectedOptions)
+    ));
   };
 
   const clearCart = () => {

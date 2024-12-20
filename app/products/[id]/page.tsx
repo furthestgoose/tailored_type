@@ -10,12 +10,13 @@ import { Product, SwappableOption, SwappableOptions } from '@/app/Productstype';
 
 export default function ProductPage() {
   const params = useParams();
+  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const quantity: number = 1;
+  const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function ProductPage() {
         setIsLoading(true);
         const response = await fetch(`http://localhost:8080/api/products/${id}`);
         if (!response.ok) throw new Error('Failed to fetch product');
+        
         
         const data: Product[] = await response.json();
         if (!data.length) throw new Error('No product found');
@@ -51,6 +53,10 @@ export default function ProductPage() {
 
   const renderProductInfo = () => {
     if (!product) return null;
+
+    if (product.type == 'keyboard') {
+      router.push(`/products/keyboards/${id}`);
+    }
 
     switch (product.type) {
       case 'switches':
@@ -135,6 +141,12 @@ export default function ProductPage() {
     );
   }
 
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, quantity);
+    }
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12">
@@ -191,8 +203,20 @@ export default function ProductPage() {
             <div className="mt-8 space-y-4">
               <p className="text-gray-700">{product.description}</p>
 
+              <div className="mt-4 flex items-center space-x-4">
+              <label htmlFor="quantity" className="text-gray-700">Quantity:</label>
+              <input
+                id="quantity"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                className="w-16 px-2 py-1 border rounded-md text-gray-700"
+              />
+            </div>
+
               <button
-                onClick={() => addToCart(product, quantity, {})}
+                onClick={() => handleAddToCart()}
                 className="w-full bg-black text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:bg-gray-800 transition duration-300"
               >
                 Add to Cart

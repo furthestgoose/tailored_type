@@ -34,13 +34,13 @@ const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
           </div>
           <h3 className="text-lg font-semibold mb-2 text-black">{product.name}</h3>
         </Link>
-        {!product.swappableOptions && (
+        {!product.swappableOptionsJson && (
           <>
             <p className="text-gray-600 text-lg">£{product.price.toFixed(2)} inc VAT</p>
             <p className="text-gray-500 text-sm">(£{(product.price - (product.price * 0.2)).toFixed(2)} ex VAT)</p>
           </>
         )}
-        {product.swappableOptions && (
+        {product.swappableOptionsJson && (
           <>
             <p className="text-gray-600 text-lg">From £{product.price.toFixed(2)} inc VAT</p>
             <p className="text-gray-500 text-sm">(From £{(product.price - (product.price * 0.2)).toFixed(2)} ex VAT)</p>
