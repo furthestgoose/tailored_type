@@ -35,7 +35,7 @@ const CartPage: React.FC = () => {
               <p className="text-gray-600">
                 £{(item.price + (item.selectedOptions ? Object.values(item.selectedOptions).reduce((sum, opt) => sum + opt.price, 0) : 0)).toFixed(2)}
               </p>
-              {item.selectedOptions && (
+              {item.selectedOptions != null && (
                 <p className="text-sm text-gray-500">
                   Options: {Object.entries(item.selectedOptions).map(([key, value]) => `${key}: ${value.name}`).join(', ')}
                 </p>

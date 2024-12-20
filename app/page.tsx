@@ -2,7 +2,7 @@
 import type { NextPage } from 'next';
 import Layout from "/Users/adambyford/Desktop/Portfolio_Projects/Web stuff/Websites/tailored_type/app/Components/Layout";
 import React, { useState, useEffect } from 'react';
-import { Product } from "@/app/mockProducts";
+import { Product } from "@/app/Productstype";
 import Slideshow from "@/app/Components/Slideshow";
 import ProductCard from "@/app/Components/Product_Card";
 

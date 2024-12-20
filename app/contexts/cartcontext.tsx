@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import { Product, SwappableOption } from '../mockProducts';
+import { Product, SwappableOption } from '../Productstype';
 
 interface CartItem extends Product {
   quantity: number;

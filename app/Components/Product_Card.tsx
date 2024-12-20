@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { Product } from "@/app/mockProducts";
+import { Product } from "@/app/Productstype";
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     const [isHovered, setIsHovered] = useState(false);
     const productLink = product.type === 'keyboard' ? `/products/keyboards/${product.id}` : `/products/${product.id}`;

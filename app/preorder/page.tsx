@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import {useEffect, useState} from 'react';
 import Layout from "/Users/adambyford/Desktop/Portfolio_Projects/Web stuff/Websites/tailored_type/app/Components/Layout";
 import ProductBrowse from "@/app/Components/productBrowse";
-import { Product } from '@/app/mockProducts';
+import { Product } from '@/app/Productstype';
 
 const switches_home : NextPage = () => {
     const [preorderProducts, setPreorderProducts] = useState<Product[]>();

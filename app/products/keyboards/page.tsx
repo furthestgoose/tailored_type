@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from "@/app/Components/Layout";
 import ProductBrowse from "@/app/Components/productBrowse";
 import ProductFilter from "@/app/Components/ProductFilter";
-import type { Product } from '@/app/mockProducts';
+import type { Product } from '@/app/Productstype';
 
 const Products_home: NextPage = () => {
   const [keyboardProducts, setKeyboardProducts] = useState<Product[]>();

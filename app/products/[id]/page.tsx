@@ -3,76 +3,51 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Layout from '@/app/Components/Layout';
-import { Product, SwappableOption } from '@/app/mockProducts';
 import Image from 'next/image';
 import { useCart } from '@/app/contexts/cartcontext';
 import RecommendedProducts from '@/app/Components/ReccomendedProducts';
+import { Product, SwappableOption, SwappableOptions } from '@/app/Productstype';
 
 export default function ProductPage() {
   const params = useParams();
-  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
-  const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: SwappableOption }>({});
-  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const quantity: number = 1;
   const { addToCart } = useCart();
 
-  // Fetch product data from the API
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(`http://localhost:8080/api/products/${id}`);
         if (!response.ok) throw new Error('Failed to fetch product');
-        const data: Product = await response.json();
-
-        if (data.type === 'keyboard') {
-          router.push(`/keyboards/${id}`);
-        } else {
-          setProduct(data);
-          setSelectedImage(data.images[0]);
-          setTotalPrice(data.price);
-
-          if (data.swappableOptions) {
-            const initialOptions: { [key: string]: SwappableOption } = {};
-            Object.entries(data.swappableOptions).forEach(([category, options]) => {
-              if (options.length > 0) initialOptions[category] = options[0];
-            });
-            setSelectedOptions(initialOptions);
-          }
-        }
+        
+        const data: Product[] = await response.json();
+        if (!data.length) throw new Error('No product found');
+        
+        const productData = data[0];
+        console.log('Product data:', productData);
+        
+        setProduct(productData);
+        setSelectedImage(productData.image || productData.images?.[0] || '');
+        setError(null);
       } catch (error) {
         console.error('Error fetching product:', error);
+        setError(error instanceof Error ? error.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProduct();
-  }, [id, router]);
+  }, [id]);
 
-  // Update total price based on selected options
-  useEffect(() => {
-    if (product) {
-      let newTotalPrice = product.price;
-      Object.values(selectedOptions).forEach(option => {
-        newTotalPrice += option.price;
-      });
-      setTotalPrice(newTotalPrice);
-    }
-  }, [product, selectedOptions]);
+  
 
-  const handleOptionChange = (category: string, option: SwappableOption) => {
-    setSelectedOptions(prev => ({
-      ...prev,
-      [category]: option,
-    }));
-  };
 
-  const handleAddToCart = () => {
-    if (product) {
-      addToCart(product, quantity, selectedOptions);
-    }
-  };
 
   const renderProductInfo = () => {
     if (!product) return null;
@@ -84,11 +59,17 @@ export default function ProductPage() {
             <h2 className="text-2xl font-semibold mb-2">Switch Specifications</h2>
             <ul className="list-disc ml-6">
               <li>Type: {product.name}</li>
-              <li>Actuation Force: 50g</li>
-              <li>Durability: 50 million keystrokes</li>
+              {product.switches && product.switches.length > 0 && (
+                <>
+                  
+                  <li>Durability: 50 million keystrokes</li>
+                </>
+              )}
+              <li>Price: £{product.price}</li>
             </ul>
           </div>
         );
+
       case 'keycaps':
         return (
           <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
@@ -97,23 +78,54 @@ export default function ProductPage() {
               <li>Material: {product.keycapsMaterial || 'PBT'}</li>
               <li>Profile: Cherry</li>
               <li>Compatibility: MX Stem</li>
+              <li>Price: £{product.price}</li>
             </ul>
           </div>
         );
+
       case 'case':
         return (
           <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
             <h2 className="text-2xl font-semibold mb-2">Case Specifications</h2>
             <ul className="list-disc ml-6">
-              <li>Material: {product.caseMaterial || 'Wood'}</li>
-              <li>Form Factor: 60%</li>
+              <li>Material: {product.caseMaterial || 'Aluminum'}</li>
+              <li>Form Factor: {product.layout || '60%'}</li>
+              <li>Price: £{product.price}</li>
             </ul>
           </div>
         );
+
       default:
-        return null;
+        return (
+          <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
+            <h2 className="text-2xl font-semibold mb-2">Product Specifications</h2>
+            <ul className="list-disc ml-6">
+              <li>Price: £{product.price}</li>
+            </ul>
+          </div>
+        );
     }
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-xl text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-xl text-red-600">{error}</div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!product) {
     return (
@@ -130,80 +142,68 @@ export default function ProductPage() {
           {/* Product Image Section */}
           <div>
             <div className="mb-6">
-              <Image
-                src={selectedImage}
-                alt={product.name}
-                width={600}
-                height={400}
-                className="w-full h-auto object-cover rounded-lg shadow-md"
-              />
-            </div>
-            <div className="grid grid-cols-4 gap-4">
-              {product.images.map((img, index) => (
-                <div
-                  key={index}
-                  className={`cursor-pointer border-2 rounded-md transition-all duration-200 hover:border-gray-600 ${
-                    img === selectedImage ? 'border-black' : 'border-transparent'
-                  }`}
-                  onClick={() => setSelectedImage(img)}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.name} view ${index + 1}`}
-                    width={150}
-                    height={150}
-                    className="w-full h-auto object-cover rounded-md"
-                  />
+              {selectedImage ? (
+                <Image
+                  src={selectedImage}
+                  alt={product.name}
+                  width={600}
+                  height={400}
+                  className="w-full h-auto object-cover rounded-lg shadow-md"
+                />
+              ) : (
+                <div className="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg shadow-md">
+                  <span className="text-gray-500">No Image Available</span>
                 </div>
-              ))}
+              )}
             </div>
+            {product.images && product.images.length > 0 && (
+              <div className="grid grid-cols-4 gap-4">
+                {product.images.map((img, index) => (
+                  <button
+                    key={index}
+                    className={`cursor-pointer border-2 rounded-md transition-all duration-200 hover:border-gray-600 ${
+                      img === selectedImage ? 'border-black' : 'border-transparent'
+                    }`}
+                    onClick={() => setSelectedImage(img)}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${product.name} view ${index + 1}`}
+                      width={150}
+                      height={150}
+                      className="w-full h-auto object-cover rounded-md"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Details Section */}
           <div>
             <h1 className="text-4xl font-bold mb-4 text-gray-900">{product.name}</h1>
-            <p className="text-2xl font-semibold text-gray-800 mb-2">
-              £{totalPrice.toFixed(2)} <span className="text-lg text-gray-500">inc VAT</span>
+            <p className="text-2xl font-semibold text-gray-800 mb-6">
+              £{product.price} <span className="text-lg text-gray-500">inc VAT</span>
             </p>
-
-            {product.swappableOptions &&
-              Object.entries(product.swappableOptions).map(([category, options]) => (
-                <div key={category} className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">{category}</label>
-                  <select
-                    className="text-black bg-grey-700 mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md"
-                    value={selectedOptions[category]?.name || ''}
-                    onChange={e =>
-                      handleOptionChange(
-                        category,
-                        options.find(opt => opt.name === e.target.value) || options[0]
-                      )
-                    }
-                  >
-                    {options.map(option => (
-                      <option key={option.name} value={option.name}>
-                        {option.name} (+£{option.price.toFixed(2)})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ))}
 
             {renderProductInfo()}
 
-            <p className="text-gray-700 mb-6 mt-6">{product.description}</p>
+            <div className="mt-8 space-y-4">
+              <p className="text-gray-700">{product.description}</p>
 
-            <div>
               <button
-                onClick={handleAddToCart}
-                className="bg-black text-white py-3 px-6 mt-8 rounded-lg font-semibold shadow-lg hover:bg-gray-800 transition duration-300"
+                onClick={() => addToCart(product, quantity, {})}
+                className="w-full bg-black text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:bg-gray-800 transition duration-300"
               >
                 Add to Cart
               </button>
             </div>
           </div>
         </div>
-        <RecommendedProducts currentProductId={id} products={[]} />
+
+        <div className="mt-16">
+          <RecommendedProducts currentProductId={id} />
+        </div>
       </div>
     </Layout>
   );

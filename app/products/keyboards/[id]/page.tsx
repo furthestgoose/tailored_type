@@ -6,7 +6,7 @@ import Layout from '@/app/Components/Layout';
 import Image from 'next/image';
 import RecommendedProducts from '@/app/Components/ReccomendedProducts';
 import { useCart } from '@/app/contexts/cartcontext';
-import { Product, SwappableOption, SwappableOptions } from '@/app/mockProducts';
+import { Product, SwappableOption, SwappableOptions } from '@/app/Productstype';
 
 
 export default function KeyboardPage() {
@@ -202,6 +202,9 @@ export default function KeyboardPage() {
                 <div>
                   <span className="font-medium">Hot-swappable:</span> {product.hotswappable}
                 </div>
+                <div>
+                  <span className="font-medium">HE:</span> {product.he}
+                </div>
               </div>
 
               <button
@@ -215,7 +218,7 @@ export default function KeyboardPage() {
         </div>
 
         <div className="mt-16">
-          <RecommendedProducts currentProductId={id} products={[]} />
+          <RecommendedProducts currentProductId={id}/>
         </div>
       </div>
     </Layout>

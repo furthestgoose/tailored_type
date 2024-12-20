@@ -1,5 +1,5 @@
 import React from 'react';
-import { Product } from "@/app/mockProducts";
+import { Product } from "@/app/Productstype";
 import ProductCard from '@/app/Components/Product_Card';
 
 interface ProductBrowseProps {

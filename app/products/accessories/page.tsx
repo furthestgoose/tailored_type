@@ -4,7 +4,7 @@ import type { NextPage } from 'next';
 import {useEffect, useState} from 'react';
 import Layout from "@/app/Components/Layout";
 import ProductBrowse from "@/app/Components/productBrowse";
-import { Product } from '@/app/mockProducts';
+import { Product } from '@/app/Productstype';
 
 const SwitchesHome: NextPage = () => {
     const [accessoryProducts, setAccessoryProducts] = useState<Product[]>();

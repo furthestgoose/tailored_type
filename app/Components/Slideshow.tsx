@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Product } from "@/app/mockProducts";
+import { Product } from "@/app/Productstype";
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Product } from '@/app/mockProducts';
+import type { Product } from '@/app/Productstype';
 
 interface FilterOptions {
   layout?: string;
@@ -32,7 +32,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilterChange,
       if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) return false;
       if (filters.type && product.type !== filters.type) return false;
       if (filters.hotswappable && product.hotswappable !== 'Yes') return false;
-      if (filters.HE && product.HE !== 'Yes') return false;
+      if (filters.HE && product.he !== 'Yes') return false;
       return true;
     });
     onFilterChange(filteredProducts);
