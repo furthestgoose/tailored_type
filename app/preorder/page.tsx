@@ -4,9 +4,11 @@ import {useEffect, useState} from 'react';
 import Layout from "/Users/adambyford/Desktop/Portfolio_Projects/Web stuff/Websites/tailored_type/app/Components/Layout";
 import ProductBrowse from "@/app/Components/productBrowse";
 import { Product } from '@/app/Productstype';
+import ProductFilter from '@/app/Components/ProductFilter';
 
 const switches_home : NextPage = () => {
     const [preorderProducts, setPreorderProducts] = useState<Product[]>();
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>();
     
       useEffect(() => {
         const fetchKeyboardProducts = async () => {
@@ -17,6 +19,7 @@ const switches_home : NextPage = () => {
             }
             const data = await response.json();
             setPreorderProducts(data);
+            setFilteredProducts(data);
           } catch (error) {
             console.error('Error fetching products:', error);
           }
@@ -26,9 +29,23 @@ const switches_home : NextPage = () => {
       }, []);
     return (
         <Layout>
-                <h1 className="text-3xl font-bold text-center text-black mb-8 mt-8">All Pre Orders:</h1>
-            <ProductBrowse products={preorderProducts} productType={"preorder"}/>
-        </Layout>
+        <h1 className="text-3xl font-bold text-center text-black mb-8 mt-8">All Pre Orders:</h1>
+        <div className="flex">
+          <div className="w-1/4">
+            <ProductFilter
+              products={preorderProducts}
+              onFilterChange={setFilteredProducts}
+              showTypeFilter={true}
+              showSwitchesFilter={true}
+            />
+          </div>
+          <div className="w-3/4">
+            <ProductBrowse
+              products={filteredProducts}
+            />
+          </div>
+        </div>
+      </Layout>
 
 
     )

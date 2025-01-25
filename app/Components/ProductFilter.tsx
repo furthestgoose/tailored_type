@@ -15,9 +15,10 @@ interface ProductFilterProps {
   products: Product[] | undefined;
   onFilterChange: (filteredProducts: Product[]) => void;
   showTypeFilter: boolean;
+  showSwitchesFilter: boolean;
 }
 
-const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilterChange, showTypeFilter }) => {
+const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilterChange, showTypeFilter , showSwitchesFilter}) => {
   const [filters, setFilters] = useState<FilterOptions>({
     priceRange: [0, 1000],
     hotswappable: false,
@@ -56,7 +57,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilterChange,
   return (
     <div className="space-y-4 p-4 bg-white rounded-lg overflow-x-auto mr-2">
       <h2 className="text-xl font-bold text-black">Filters</h2>
-
+      {showSwitchesFilter && (
       <div>
         <label className="block text-xl font-medium text-black">Layout</label>
         <select
@@ -70,7 +71,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilterChange,
           ))}
         </select>
       </div>
-
+        )}
       <div className="flex items-center space-x-2">
         <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
           <span className="text-black px-2">£</span>
@@ -115,39 +116,43 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilterChange,
         </div>
       )}
 
-      <label className="block text-xl font-medium text-black">Switch Mount</label>
-      <div className="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          id="hotswappable"
-          checked={filters.hotswappable}
-          onChange={(e) => handleFilterChange('hotswappable', e.target.checked)}
-          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-        />
-        <label
-          htmlFor="hotswappable"
-          className="text-sm font-medium text-black"
-        >
-          Hot-swappable only
-        </label>
-      </div>
-
-      <label className="block text-xl font-medium text-black">Switch Type</label>
-      <div className="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          id="HE"
-          checked={filters.HE}
-          onChange={(e) => handleFilterChange('HE', e.target.checked)}
-          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-        />
-        <label
-          htmlFor="HE"
-          className="text-sm font-medium text-black"
-        >
-          Magnetic (Hall-Effect)
-        </label>
-      </div>
+      {showSwitchesFilter && (
+        <>
+          <label className="block text-xl font-medium text-black">Switch Mount</label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="hotswappable"
+              checked={filters.hotswappable}
+              onChange={(e) => handleFilterChange('hotswappable', e.target.checked)}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label
+              htmlFor="hotswappable"
+              className="text-sm font-medium text-black"
+            >
+              Hot-swappable only
+            </label>
+          </div>
+      
+          <label className="block text-xl font-medium text-black">Switch Type</label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="HE"
+              checked={filters.HE}
+              onChange={(e) => handleFilterChange('HE', e.target.checked)}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label
+              htmlFor="HE"
+              className="text-sm font-medium text-black"
+            >
+              Magnetic (Hall-Effect)
+            </label>
+          </div>
+        </>
+      )}
     </div>
   );
 };

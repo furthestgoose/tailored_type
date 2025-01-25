@@ -32,7 +32,7 @@ const Products_home : NextPage = () => {
                 <h1 className="text-3xl font-bold text-center text-black mb-8 mt-8">All Products:</h1>
                 <div className="flex">
                     <div className="w-1/4">
-                <ProductFilter products={allProducts} onFilterChange={setFilteredProducts} showTypeFilter={true}/>
+                <ProductFilter products={allProducts} onFilterChange={setFilteredProducts} showTypeFilter={true} showSwitchesFilter={true}/>
                     </div>
                     <div className="w-3/4">
             <ProductBrowse products={filteredProducts}/>

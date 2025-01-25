@@ -192,11 +192,7 @@ export default function KeyboardPage() {
               })}
             </div>
 
-            
-
-            <div className="mt-8 space-y-4">
-              <p className="text-gray-700">{product.description}</p>
-              <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
+            <div className="bg-gray-100 p-4 rounded-lg shadow-md mt-6 text-black">
             <h2 className="text-2xl font-semibold mb-2">{product.name} Specifications</h2>
             <ul className="list-disc ml-6">
               <li>Layout: {product.layout}</li>
@@ -204,6 +200,9 @@ export default function KeyboardPage() {
               <li>Hall Effect: {product.he}</li>
             </ul>
           </div>
+            <div className="mt-8 space-y-4">
+              <p className="text-gray-700">{product.description}</p>
+              
               
 
               <button

@@ -38,6 +38,7 @@ const Products_home: NextPage = () => {
             products={keyboardProducts}
             onFilterChange={setFilteredProducts}
             showTypeFilter={false}
+            showSwitchesFilter={true}
           />
         </div>
         <div className="w-3/4">

@@ -5,9 +5,11 @@ import {useEffect, useState} from 'react';
 import Layout from "@/app/Components/Layout";
 import ProductBrowse from "@/app/Components/productBrowse";
 import { Product } from '@/app/Productstype';
+import ProductFilter from '@/app/Components/ProductFilter';
 
 const SwitchesHome: NextPage = () => {
     const [groupBuyAndPreorderProducts, setGroupBuyAndPreorderProducts] = useState<Product[]>();
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>();
     
       useEffect(() => {
         const fetchKeyboardProducts = async () => {
@@ -18,6 +20,7 @@ const SwitchesHome: NextPage = () => {
             }
             const data = await response.json();
             setGroupBuyAndPreorderProducts(data);
+            setFilteredProducts(data);
           } catch (error) {
             console.error('Error fetching products:', error);
           }
@@ -28,11 +31,23 @@ const SwitchesHome: NextPage = () => {
 
     return (
         <Layout>
-            <h1 className="text-3xl font-bold text-center text-black mb-8 mt-8">
-                All Group Buys & Pre Orders:
-            </h1>
-            <ProductBrowse products={groupBuyAndPreorderProducts} />
-        </Layout>
+        <h1 className="text-3xl font-bold text-center text-black mb-8 mt-8">All Group Buys & Pre Orders:</h1>
+        <div className="flex">
+          <div className="w-1/4">
+            <ProductFilter
+              products={groupBuyAndPreorderProducts}
+              onFilterChange={setFilteredProducts}
+              showTypeFilter={true}
+              showSwitchesFilter={true}
+            />
+          </div>
+          <div className="w-3/4">
+            <ProductBrowse
+              products={filteredProducts}
+            />
+          </div>
+        </div>
+      </Layout>
     );
 };
 
