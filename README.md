@@ -21,7 +21,7 @@ To get started with the project, follow these steps:
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/tailored_type.git
+    git clone https://github.com/furthestgoose/tailored_type.git
     ```
 2. Navigate to the project directory:
     ```bash
@@ -49,10 +49,12 @@ git checkout spring-mvc
 ## Screenshots
 
 Here are some screenshots of the Tailored Type website:
+![Home Page](https://github.com/user-attachments/assets/66a15f02-d942-4c0c-8118-826c2f9d6f12)
+![Product Page](https://github.com/user-attachments/assets/0dcbf213-3590-49dd-b3fb-850eb2a6f3f8)
+![Product Browse Page](https://github.com/user-attachments/assets/131cc306-560d-4047-b316-644cfaf0e155)
+![About Us Page](https://github.com/user-attachments/assets/12e599a7-6d80-44bc-aab7-b53371e813f7)
+![Cart Page](https://github.com/user-attachments/assets/988c8875-94c9-487c-8a9b-fbc8253ed4e0)
 
-![Home Page](screenshots/home_page.png)
-![Product Page](screenshots/product_page.png)
-![Cart Page](screenshots/cart_page.png)
 
 ## Contributing
 
@@ -60,5 +62,5 @@ We welcome contributions! Please fork the repository and submit pull requests fo
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/furthestgoose/tailored_type/blob/main/LICENSE) file for details.
 
