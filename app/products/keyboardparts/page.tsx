@@ -30,25 +30,31 @@ const SwitchesHome: NextPage = () => {
       }, []);
 
     return (
-        <Layout>
-        <h1 className="text-3xl font-bold text-center text-black mb-8 mt-8">Keyboard Parts:</h1>
-        <div className="flex">
-          <div className="w-1/4">
-            <ProductFilter
-              products={keyboardpartsProducts}
-              onFilterChange={setFilteredProducts}
-              showTypeFilter={true}
-              showSwitchesFilter={false}
-            />
-          </div>
-          <div className="w-3/4">
-            <ProductBrowse
-              products={filteredProducts}
-            />
-          </div>
-        </div>
-      </Layout>
-    );
+      <Layout>
+        <h1 className="text-2xl md:text-3xl font-bold text-center text-black mb-6 mt-6">
+    Keyboard Parts
+  </h1>
+      <div className="container mx-auto">
+  
+  <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+    <div className="w-full lg:w-1/4 lg:pr-4">
+      <ProductFilter
+        products={keyboardpartsProducts}
+        onFilterChange={setFilteredProducts}
+        showTypeFilter={true}
+        showSwitchesFilter={false}
+      />
+    </div>
+    <div className="w-full lg:w-3/4">
+      <ProductBrowse
+        products={filteredProducts}
+      />
+    </div>
+  </div>
+</div>
+    </Layout>
+  );
+      
 };
 
 export default SwitchesHome;

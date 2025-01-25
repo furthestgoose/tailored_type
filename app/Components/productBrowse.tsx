@@ -8,32 +8,29 @@ interface ProductBrowseProps {
 }
 
 const ProductBrowse: React.FC<ProductBrowseProps> = ({ products, productType }) => {
-  // Handle loading state
   if (!products) {
     return (
-      <div className="text-center">
-        <h1 className="text-black text-2xl">Loading products...</h1>
+      <div className="text-center py-10">
+        <h1 className="text-lg md:text-2xl text-black">Loading products...</h1>
       </div>
     );
   }
 
-  // Filter products by type if specified
-  const availableProducts = products.filter(product =>
-    (!productType || product.type === productType)
+  const availableProducts = products.filter(product => 
+    !productType || product.type === productType
   );
 
-  // Show all available products instead of random ones
   return (
     <div>
       {availableProducts.length > 0 ? (
-        <div className="grid md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
           {availableProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (
-        <div className="text-center">
-          <h1 className="text-black text-2xl">No Products found :(</h1>
+        <div className="text-center py-10">
+          <h1 className="text-lg md:text-2xl text-black">No Products found :(</h1>
         </div>
       )}
     </div>

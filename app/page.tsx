@@ -7,16 +7,12 @@ import Slideshow from "@/app/Components/Slideshow";
 import ProductCard from "@/app/Components/Product_Card";
 
 const ProductSection: React.FC<{ title: string; products: Product[] }> = ({ title, products }) => (
-  <section className="w-full py-12 px-4 sm:px-6 lg:px-8">
-    <h2 className="text-3xl font-semibold mb-8 text-center text-black">{title}</h2>
-    <div className="relative">
-      <div className="overflow-x-auto pb-4 hide-scrollbar">
-        <div className="flex space-x-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
+  <section className="w-full py-8 px-4 sm:px-6 lg:px-8">
+    <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center text-black">{title}</h2>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
     </div>
   </section>
 );
@@ -27,70 +23,40 @@ const Home: NextPage = () => {
   const [preOrders, setPreOrders] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
-    useEffect(() => {
-        const fetchFeaturedProducts = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/api/products/featured');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch featured products');
-                }
-                const data = await response.json();
-                setFeaturedProducts(data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        const fetchRecentProducts = async () => {
-            try{
-                const response = await fetch('http://localhost:8080/api/products/recent');
-                if (!response.ok){
-                    throw new Error('Failed to fetch recent products');
-                }
-                const data = await response.json();
-                setRecentProducts(data);
-            } catch (error){
-                console.error(error);
-            }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [recentResponse, groupBuysResponse, preOrdersResponse, featuredResponse] = await Promise.all([
+          fetch('http://localhost:8080/api/products/recent'),
+          fetch('http://localhost:8080/api/products/groupbuys'),
+          fetch('http://localhost:8080/api/products/preorders'),
+          fetch('http://localhost:8080/api/products/featured')
+        ]);
+        if (!recentResponse.ok || !groupBuysResponse.ok || !preOrdersResponse.ok || !featuredResponse.ok) {
+          throw new Error('Failed to fetch product data');
         }
-        const fetchGroupBuys = async () => {
-            try{
-                const response = await fetch('http://localhost:8080/api/products/groupbuys');
-                if (!response.ok){
-                    throw new Error('Failed to fetch group buys');
-                }
-                const data = await response.json();
-                setGroupBuys(data);
-            }catch (error){
-                console.error(error);
-            }
-        }
-        const fetchPreOrders = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/api/products/preorders');
-                if(!response.ok){
-                    throw new Error('Failed to fetch pre orders');
-                }
-                const data = await response.json();
-                setPreOrders(data);
-            } catch (error){
-                console.error(error);
-            }
-        }
-
-        fetchGroupBuys()
-        fetchRecentProducts()
-        fetchFeaturedProducts()
-        fetchPreOrders()
-    }, []);
-
+        const [recentData, groupBuysData, preOrdersData, featuredData] = await Promise.all([
+          recentResponse.json(),
+          groupBuysResponse.json(),
+          preOrdersResponse.json(),
+          featuredResponse.json()
+        ]);
+        setRecentProducts(recentData);
+        setGroupBuys(groupBuysData);
+        setPreOrders(preOrdersData);
+        setFeaturedProducts(featuredData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <Layout>
-      <section className="w-full h-[60vh] text-center bg-gradient-to-r from-green-700 to-gray-200">
+      <section className="w-full h-[40vh] sm:h-[50vh] md:h-[60vh] text-center bg-gradient-to-r from-green-700 to-gray-200">
         <Slideshow products={featuredProducts.slice(0, 6)} />
       </section>
-
       <ProductSection title="Featured Products" products={featuredProducts} />
       <ProductSection title="Recently Added" products={recentProducts} />
       <ProductSection title="Open Group Buys" products={groupBuys} />

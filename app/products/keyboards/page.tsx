@@ -31,23 +31,28 @@ const Products_home: NextPage = () => {
 
   return (
     <Layout>
-      <h1 className="text-3xl font-bold text-center text-black mb-8 mt-8">Keyboard Products:</h1>
-      <div className="flex">
-        <div className="w-1/4">
-          <ProductFilter
-            products={keyboardProducts}
-            onFilterChange={setFilteredProducts}
-            showTypeFilter={false}
-            showSwitchesFilter={true}
-          />
-        </div>
-        <div className="w-3/4">
-          <ProductBrowse
-            products={filteredProducts}
-            productType="keyboard"
-          />
-        </div>
-      </div>
+      <h1 className="text-2xl md:text-3xl font-bold text-center text-black mb-6 mt-6">
+    Keyboard Products
+  </h1>
+      <div className="container mx-auto">
+  
+  <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+    <div className="w-full lg:w-1/4 lg:pr-4">
+      <ProductFilter
+        products={keyboardProducts}
+        onFilterChange={setFilteredProducts}
+        showTypeFilter={false}
+        showSwitchesFilter={true}
+      />
+    </div>
+    <div className="w-full lg:w-3/4">
+      <ProductBrowse
+        products={filteredProducts}
+        productType="keyboard"
+      />
+    </div>
+  </div>
+</div>
     </Layout>
   );
 };

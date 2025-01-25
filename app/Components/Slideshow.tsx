@@ -23,7 +23,7 @@ const Slideshow: React.FC<{ products: Product[] }> = ({ products }) => {
   };
 
   return (
-    <div className="relative w-full h-[60vh] overflow-hidden">
+    <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
       {products.map((product, index) => (
         <div
           key={product.id}
@@ -41,11 +41,13 @@ const Slideshow: React.FC<{ products: Product[] }> = ({ products }) => {
             />
           </div>
           <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
-            <h3 className="text-lg font-semibold">{product.name}</h3>
-            {product.swappableOptions && <p className="text-lg">From £{product.price.toFixed(2)} inc VAT</p>}
-            {!product.swappableOptions && <p className="text-lg">£{product.price.toFixed(2)} inc VAT</p>}
+            <h3 className="text-sm sm:text-lg font-semibold">{product.name}</h3>
+            {product.swappableOptionsJson 
+              ? <p className="text-xs sm:text-lg">From £{product.price.toFixed(2)} inc VAT</p>
+              : <p className="text-xs sm:text-lg">£{product.price.toFixed(2)} inc VAT</p>
+            }
             <Link href={product.type === 'keyboard' ? `/products/keyboards/${product.id}` : `/products/${product.id}`}>
-              <button className="mt-2 bg-white text-black py-2 px-4 rounded hover:bg-gray-200 transition-colors duration-300">
+              <button className="mt-2 text-xs sm:text-base bg-white text-black py-1 px-2 sm:py-2 sm:px-4 rounded hover:bg-gray-200 transition-colors duration-300">
                 Buy Now!
               </button>
             </Link>
@@ -56,17 +58,17 @@ const Slideshow: React.FC<{ products: Product[] }> = ({ products }) => {
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevious}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 z-50"
+        className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 z-50"
         aria-label="Previous slide"
       >
-        <ChevronLeft size={24} />
+        <ChevronLeft className=' size={16} sm:size={24}' />
       </button>
       <button
         onClick={goToNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 z-50"
+        className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-75 transition-all duration-300 z-50"
         aria-label="Next slide"
       >
-        <ChevronRight size={24} />
+        <ChevronRight  className='size={16} sm:size={24}'/>
       </button>
     </div>
   );
